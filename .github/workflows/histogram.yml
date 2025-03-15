@@ -27,7 +27,7 @@ jobs:
 
       # Run the script to generate the histogram
       - name: Generate histogram (all issues)
-        run: python qa_tools/histogram.py
+        run: python scripts/histogram.py
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}  # Replace with your GitHub Token secret
 

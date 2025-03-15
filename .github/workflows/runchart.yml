@@ -41,7 +41,7 @@ jobs:
           echo "ISSUES_FILE=issues.json" >> $GITHUB_ENV
 
       - name: 📊 Ejecutar el script de generación de gráficos
-        run: python .github/scripts/scriptrunchart.py  # Ajusta la ruta si es necesario
+        run: python scripts/scriptrunchart.py  # Ajusta la ruta si es necesario
 
        # Subir los gráficos como artifacts
       - name: Subir gráficos como artifacts

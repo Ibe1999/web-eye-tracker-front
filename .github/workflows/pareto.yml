@@ -51,7 +51,7 @@ jobs:
     
       - name: Run Pareto analysis script
         run: |
-          python .github/scripts/pareto.py
+          python scripts/pareto.py
 
       - name: Check if Pareto chart is generated
         run: |
