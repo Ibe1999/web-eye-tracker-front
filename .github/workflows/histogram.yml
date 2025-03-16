@@ -3,7 +3,7 @@ name: General Report - Histogram of Issues (all)
 on:
   schedule:
     - cron: '0 0 * * SUN'  # Runs every Sunday at 00:00 UTC
-  workflow_dispatch:  # Also allows manual trigger
+  workflow_dispatch:  # Allows for manual trigger
 
 jobs:
   build:
@@ -28,14 +28,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: List files in artifacts directory (debug)
+      - name: List contents of artifacts directory (debug)
         run: |
-          echo "Checking contents of the artifacts directory"
-          ls -R artifacts/
-
-      - name: Check if histogram.png exists (debug)
-        run: |
-          if [ -f artifacts/histogram.png ]; then echo "histogram.png exists"; else echo "histogram.png not found"; fi
+          echo "Listing contents of the artifacts directory to verify histogram.png exists:"
+          ls -R artifacts/  # List contents of artifacts directory
 
       - name: Configure git
         run: |
@@ -55,6 +51,7 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
 
