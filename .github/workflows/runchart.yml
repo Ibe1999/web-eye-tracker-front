@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: 📥 Clonar el repositorio
         uses: actions/checkout@v4
+        with:
+          ref: main  # Especifica la rama main
 
       - name: Install Spanish locale
         run: |
@@ -92,6 +94,6 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add artifacts/*.png
           git commit -m "Actualización automática de gráficos [skip ci]"
-          git push origin HEAD:${{ github.ref }}
+          git push origin main  # Push to the main branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
