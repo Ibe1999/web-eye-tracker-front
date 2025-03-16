@@ -29,7 +29,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: List files in artifacts directory (debug)
-        run: ls -R artifacts/
+        run: ls -R artifacts/  # This will list files and show if the histogram.png file was created
 
       - name: Configure git
         run: |
@@ -38,11 +38,12 @@ jobs:
 
       - name: Add files to git
         run: |
-          git add artifacts/*.png  # Add histogram file
+          git add artifacts/*.png  # Add any PNG file in the artifacts/ directory
           git status  # Check if the file is staged for commit
           git commit -m "Add histogram of issues" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
