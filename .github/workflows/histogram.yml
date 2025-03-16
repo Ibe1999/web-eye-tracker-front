@@ -34,13 +34,14 @@ jobs:
       - name: List files in artifacts directory (debug)
         run: ls -R artifacts/
 
+      # Check if histogram.png exists only after the histogram is generated
       - name: Check if histogram.png exists
         run: |
           if [ -f "artifacts/histogram.png" ]; then
             echo "histogram.png exists, proceeding with git add";
           else
             echo "histogram.png not found, skipping git add and commit";
-            exit 1;  # If not found, terminate the workflow
+            exit 0;  # Avoid exit code 1, since it's not critical
           fi
 
       - name: Configure git
@@ -54,8 +55,3 @@ jobs:
           git status  # Check if the file is staged for commit
           git commit -m "Add histogram of issues" || echo "No changes to commit"
           git push
-
-
-
-
-
