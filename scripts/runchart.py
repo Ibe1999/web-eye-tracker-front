@@ -25,6 +25,11 @@ except Exception as e:
     print(f"Error al leer el archivo de issues: {e}")
     sys.exit(1)
 
+# Verificar si hay issues en el archivo
+if not issues:
+    print("Error: No issues found in the JSON file.")
+    sys.exit(1)
+
 def week_of_month(fecha):
     return (fecha.day - 1) // 7 + 1
 
@@ -74,7 +79,7 @@ plt.title('Progresión Semanal de Issues')
 plt.legend()
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig(os.path.join(output_dir, f'grafico_semanal_{fecha_str}.png'), dpi=300)
+plt.savefig(os.path.join(output_dir, 'runchart.png'), dpi=300)  # Guardar como runchart.png
 plt.close()
 
 # 2. Gráfico Mensual por Semanas
@@ -94,7 +99,6 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig(os.path.join(output_dir, f'grafico_mensual_{año_mes_actual}.png'), dpi=300)
 plt.close()
-
 
 # 3. Gráfico Global Mensual
 plt.figure()
