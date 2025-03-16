@@ -2,8 +2,8 @@ name: General Report - Histogram of Issues (all)
 
 on:
   schedule:
-    - cron: '0 0 * * SUN'  # Runs every Sunday at 00:00 UTC
-  workflow_dispatch:  # Allows for manual trigger
+    - cron: '0 0 * * SUN'  # Every Sunday at midnight
+  workflow_dispatch:  # Allows manual trigger
 
 jobs:
   build:
@@ -28,10 +28,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: List contents of artifacts directory (debug)
+      - name: List files in artifacts directory (debug)
+        run: ls -R artifacts/
+
+      - name: Check if histogram.png exists
         run: |
-          echo "Listing contents of the artifacts directory to verify histogram.png exists:"
-          ls -R artifacts/  # List contents of artifacts directory
+          if [ -f "artifacts/histogram.png" ]; then
+            echo "histogram.png exists, proceeding with git add";
+          else
+            echo "histogram.png not found, skipping git add and commit";
+            exit 1;
+          fi
 
       - name: Configure git
         run: |
@@ -40,17 +47,12 @@ jobs:
 
       - name: Add histogram PNG to git
         run: |
-          # Check if the histogram.png file exists before adding it to git
-          if [ -f artifacts/histogram.png ]; then
-            git add artifacts/histogram.png
-            git commit -m "Add histogram of issues"
-            git push
-          else
-            echo "histogram.png not found, skipping git add and commit"
-            exit 1
-          fi
+          git add artifacts/histogram.png
+          git commit -m "Add histogram of issues"
+          git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
 
