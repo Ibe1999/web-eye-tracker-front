@@ -48,6 +48,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gráficos  # Nombre del artifact que puedes usar para identificarlo
-          path: artifacts/*.png  # Path ajustado para los artifacts en la carpeta artifacts
+          path: artifacts/runchart.png  # Path ajustado para los artifacts en la carpeta artifacts
 
         continue-on-error: true
