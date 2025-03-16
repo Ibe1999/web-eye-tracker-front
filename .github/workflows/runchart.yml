@@ -6,8 +6,8 @@ on:
   workflow_dispatch:  # Permite ejecución manual
 
 permissions:
-  contents: write
-  issues: read
+  contents: write  # Permiso para escribir en el repositorio
+  issues: read     # Permiso para leer issues
 
 jobs:
   generate-report:
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: 📥 Clonar el repositorio
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Clona todo el historial de commits
 
       - name: 🌍 Instalar localización en español
         run: |
@@ -50,4 +52,23 @@ jobs:
           name: gráficos  # Nombre del artifact que puedes usar para identificarlo
           path: artifacts/runchart.png  # Path ajustado para los artifacts en la carpeta artifacts
 
-        continue-on-error: true
+      # Commit y push de los artifacts al repositorio
+      - name: 💾 Commit y push de los artifacts
+        run: |
+          # Configurar Git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Crear una rama nueva para los cambios
+          git checkout -b artifacts-update
+
+          # Agregar los archivos generados
+          git add artifacts/runchart.png
+
+          # Hacer commit de los cambios
+          git commit -m "Actualización automática de gráficos [skip ci]"
+
+          # Hacer push de los cambios al repositorio
+          git push origin artifacts-update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Token para autenticación
