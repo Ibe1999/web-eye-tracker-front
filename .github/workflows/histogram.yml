@@ -2,8 +2,8 @@ name: General Report - Histogram of Issues (all)
 
 on:
   schedule:
-    - cron: '0 0 * * SUN'
-  workflow_dispatch:
+    - cron: '0 0 * * SUN'  # Runs every Sunday at 00:00 UTC
+  workflow_dispatch:  # Also allows manual trigger
 
 jobs:
   build:
@@ -43,5 +43,6 @@ jobs:
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
