@@ -6,7 +6,7 @@ from github import Github
 token = os.getenv('GITHUB_TOKEN')
 
 # List of repositories to analyze
-repositories = ["Ibe1999/web-eye-tracker-front"]  # Replace with your actual repo names
+repositories = ["username/repository"]
 
 # Authenticate with GitHub API
 g = Github(token)
@@ -33,11 +33,11 @@ def generate_plot(repo_name, labels_count):
     plt.xticks(rotation=30, ha='right')
     plt.tight_layout()
 
-    # Ensure the artifacts directory exists inside the repository folder
-    artifacts_dir = "artifacts"  # Path relative to the repository
+    # Ensure the artifacts directory exists
+    artifacts_dir = "artifacts"
     os.makedirs(artifacts_dir, exist_ok=True)
 
-    # Save as 'histogram.png' in the artifacts directory
+    # Save as 'histogram.png' inside the artifacts directory
     filename = os.path.join(artifacts_dir, "histogram.png")
     plt.savefig(filename)
     print(f"Histogram saved as {filename}")
@@ -57,6 +57,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
