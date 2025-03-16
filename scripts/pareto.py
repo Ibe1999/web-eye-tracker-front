@@ -4,14 +4,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import json
 
+# Ensure artifacts directory exists
+ARTIFACTS_DIR = 'artifacts'
+os.makedirs(ARTIFACTS_DIR, exist_ok=True)
+
 # Get issues data from file
-issues_file = os.getenv('ISSUES_FILE')
+issues_file = os.getenv('ISSUES_FILE', 'issues.json')
 with open(issues_file, 'r') as file:
     issues_data = file.read()
 
 issues = json.loads(issues_data)
 print("Total issues fetched:", len(issues))
 
+# Define regex pattern for conventional commits
 conventional_commit_pattern = r"^(feat|fix|docs|chore|style|refactor|test|build|ci|perf|merge|revert|workflow|types|wip):"
 
 titles = [issue['title'] for issue in issues]
@@ -57,8 +62,10 @@ plt.title('Pareto Chart of Commit Types')
 plt.xticks(rotation=45)
 plt.grid(True)
 
-# Save the plot to the desired location within artifacts directory
-output_dir = 'artifacts/pareto_chart.png'
-os.makedirs(os.path.dirname(output_dir), exist_ok=True)  # Ensure directory exists
-plt.savefig(output_dir, bbox_inches='tight')
+# Save the plot to the artifacts directory
+output_path = os.path.join(ARTIFACTS_DIR, 'pareto_chart.png')
+plt.savefig(output_path, bbox_inches='tight')
 plt.show()
+
+print(f"Pareto chart saved to: {output_path}")
+
