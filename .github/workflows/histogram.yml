@@ -29,7 +29,7 @@ jobs:
       - name: Generate histogram (all issues)
         run: python scripts/histogram.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PATH }}  # Replace with your GitHub Token secret
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}  # Replace with your GitHub Token secret
 
       # Upload the generated histogram as an artifact
       - name: Upload Histogram
