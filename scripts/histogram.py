@@ -36,6 +36,7 @@ def generate_histogram(repo_name, labels_count):
 
     # Define the path to save the histogram image
     artifacts_dir = "artifacts"  # Ensure this matches the directory name
+    os.makedirs(artifacts_dir, exist_ok=True)  # Create the directory if it doesn't exist
     filename = os.path.join(artifacts_dir, "histogram.png")
     print(f"Saving histogram to {filename}")  # Debugging output
     
