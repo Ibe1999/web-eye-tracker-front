@@ -66,7 +66,7 @@ def get_devops_phases():
         all_labels = response.json()
         devops_labels = [label["name"] for label in all_labels if label["name"] in [
             "Plan", "Code", "Build", "Test", "Release", "Deploy", "Operate", "Monitor"
-        ]]
+        ]] 
 
         # If no specific DevOps labels, use default set
         if not devops_labels:
@@ -78,7 +78,6 @@ def get_devops_phases():
         return devops_labels
     except Exception as e:
         print(f"Error fetching GitHub labels: {e}")
-        # Return default phases in case of error
         return [
             "Plan", "Code", "Build", "Test",
             "Release", "Deploy", "Operate", "Monitor"
@@ -87,11 +86,9 @@ def get_devops_phases():
 def get_completed_issues_by_week(phase, start_date, end_date):
     """Get completed issues for a phase in date range"""
     try:
-        # Format dates for GitHub API
         start_date_str = start_date.strftime('%Y-%m-%d')
         end_date_str = end_date.strftime('%Y-%m-%d')
 
-        # Query closed issues with specific label in date range
         query = f"repo:{GITHUB_REPOSITORY} label:\"{phase}\" closed:{start_date_str}..{end_date_str}"
         response = requests.get(
             "https://api.github.com/search/issues",
@@ -107,18 +104,14 @@ def get_completed_issues_by_week(phase, start_date, end_date):
 
 def generate_month_checklist(year, month):
     """Generate checklist data for a specific month"""
-    # Get DevOps phases
     devops_phases = get_devops_phases()
 
-    # Calculate dates for weeks in month
     first_day = datetime(year, month, 1)
     _, last_day_num = calendar.monthrange(year, month)
     last_day = datetime(year, month, last_day_num)
-    
-    # Format month name for filename
+
     month_name = first_day.strftime('%B_%Y')
 
-    # Divide month into 4 weeks (approximately)
     days_in_month = (last_day - first_day).days + 1
     days_per_week = days_in_month // 4
 
@@ -126,17 +119,15 @@ def generate_month_checklist(year, month):
     for i in range(4):
         start = first_day + timedelta(days=(i * days_per_week))
         end = first_day + timedelta(days=((i + 1) * days_per_week) - 1)
-        if i == 3:  # For last week, ensure it includes last day
+        if i == 3:
             end = last_day
         weeks.append((start, end))
 
-    # Create checklist structure
     checklist_data = {
         "month": datetime(year, month, 1).strftime('%B %Y'),
         "phases": {}
     }
 
-    # Get data for each phase
     for phase in devops_phases:
         phase_data = {
             "week1": {
@@ -157,7 +148,6 @@ def generate_month_checklist(year, month):
             }
         }
 
-        # Calculate total issues
         total_issues = sum([phase_data[f"week{i + 1}"]["issues_count"] for i in range(4)])
         phase_data["total_issues"] = total_issues
 
@@ -167,15 +157,15 @@ def generate_month_checklist(year, month):
 
 def generate_check_sheet_png(checklist_data, month_name):
     """Generate PNG visualization of the check sheet data as a table with checkboxes"""
-    month = checklist_data["month"]
-    phases = checklist_data["phases"]
-    
-    # Define output path with month and year
-    output_path = f"checksheet_{month_name}.png"
-    
+    # Create the artifacts directory if it doesn't exist
+    os.makedirs("artifacts", exist_ok=True)
+
+    # Define output path inside the artifacts directory
+    output_path = f"artifacts/checksheet_{month_name}.png"
+
     # Create a pandas DataFrame for visualization
     data = []
-    for phase, phase_data in phases.items():
+    for phase, phase_data in checklist_data["phases"].items():
         row = {
             'Phase': phase,
             'Week 1': phase_data['week1']['issues_count'],
@@ -185,17 +175,17 @@ def generate_check_sheet_png(checklist_data, month_name):
             'Total': phase_data['total_issues']
         }
         data.append(row)
-    
+
     df = pd.DataFrame(data)
-    
+
     # Set up the figure with appropriate size
     plt.figure(figsize=(10, 6))
-    
+
     # Hide axes
     ax = plt.gca()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
-    
+
     # Create table
     cell_text = []
     for _, row in df.iterrows():
@@ -206,22 +196,19 @@ def generate_check_sheet_png(checklist_data, month_name):
             elif col == 'Total':
                 cell_row.append(str(row[col]))
             else:
-                # Add checkbox representation based on issue count
                 count = row[col]
                 cell_row.append(f"{count}")
         cell_text.append(cell_row)
-    
+
     # Table colors
     colors = []
     for i in range(len(df)):
-        row_colors = ['#f8f9fa']  # Light gray for phase column
+        row_colors = ['#f8f9fa']
         for week in ['Week 1', 'Week 2', 'Week 3', 'Week 4']:
-            # Use lighter background for all cells
             row_colors.append('#ffffff')
-        row_colors.append('#f2f2f2')  # Light gray for total column
+        row_colors.append('#f2f2f2')
         colors.append(row_colors)
-    
-    # Create and customize table
+
     table = ax.table(
         cellText=cell_text,
         colLabels=['Phase', 'Week 1', 'Week 2', 'Week 3', 'Week 4', 'Total Issues'],
@@ -229,40 +216,37 @@ def generate_check_sheet_png(checklist_data, month_name):
         cellLoc='center',
         cellColours=colors
     )
-    
-    # Style the table
+
     table.auto_set_font_size(False)
     table.set_fontsize(12)
-    table.scale(1, 1.5)  # Adjust table scale
-    
+    table.scale(1, 1.5)
+
     # Set title
-    plt.title(f'DevOps Check Sheet - {month}', fontsize=16, pad=20)
-    
+    plt.title(f'DevOps Check Sheet - {checklist_data["month"]}', fontsize=16, pad=20)
+
     # Adjust layout and save
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    
+
     print(f"Check sheet visualization generated: {output_path}")
 
 def main():
-    # Get current month and year
     now = datetime.now()
     year = now.year
     month = now.month
 
     # Create DevOps labels if they don't exist
     create_devops_labels()
-    
+
     # Generate checklist data
     checklist_data, month_name = generate_month_checklist(year, month)
-    
+
     # Generate PNG visualization
     generate_check_sheet_png(checklist_data, month_name)
-    
+
     print("Check sheet generation complete")
 
 if __name__ == "__main__":
-    # Script can run without token in GitHub Actions for basic functionality
     if not GITHUB_TOKEN and not os.environ.get("GITHUB_ACTIONS"):
         print("Warning: GITHUB_TOKEN not set. Some functionality will be limited.")
         print("For full functionality: export GITHUB_TOKEN=ghp_abc123...")
