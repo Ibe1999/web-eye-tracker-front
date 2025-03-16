@@ -13,7 +13,7 @@ except locale.Error:
     print("Advertencia: No se pudo configurar la localización es_ES.UTF-8")
 
 # Definir un directorio de salida para los gráficos
-output_dir = 'output'
+output_dir = 'artifacts'
 os.makedirs(output_dir, exist_ok=True)
 
 # Leer el archivo issues.json generado por la acción de GitHub
