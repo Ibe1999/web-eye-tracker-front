@@ -1,41 +1,60 @@
-name: General Report - Histogram of Issues (all)
+import matplotlib.pyplot as plt
+import os
+from github import Github
 
-on:
-  schedule:
-    - cron: '0 0 * * SUN'
-  workflow_dispatch:
+# Authenticate with GitHub API using the token automatically provided by GitHub Actions
+token = os.getenv('GITHUB_TOKEN')
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# List of repositories to analyze
+repositories = ["username/repository"]
 
-    steps:
-      - uses: actions/checkout@v4
+# Authenticate with GitHub API
+g = Github(token)
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
+def count_labels(repo):
+    """Count the number of issues for each label in a repository."""
+    labels_count = {}
+    for issue in repo.get_issues(state="all"):
+        for label in issue.labels:
+            labels_count[label.name] = labels_count.get(label.name, 0) + 1
+    return labels_count
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install PyGithub matplotlib
+def generate_plot(repo_name, labels_count):
+    """Generate and save a histogram of issue labels."""
+    if not labels_count:
+        print(f"No labeled issues found in {repo_name}.")
+        return None  
 
-      - name: Generate histogram (all issues)
-        run: python scripts/histogram.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+    plt.figure(figsize=(10, 6))
+    plt.bar(labels_count.keys(), labels_count.values(), color='b')
+    plt.ylabel('Number of Issues')
+    plt.xlabel('Labels')
+    plt.title(f'Histogram of Issues by Label - {repo_name}')
+    plt.xticks(rotation=30, ha='right')
+    plt.tight_layout()
 
-      - name: Create artifacts directory
-        run: mkdir -p artifacts
+    # Ensure the artifacts directory exists
+    artifacts_dir = "artifacts/histograms"
+    os.makedirs(artifacts_dir, exist_ok=True)
 
-      - name: Move Histogram to artifacts directory
-        run: mv *.png artifacts/
+    filename = os.path.join(artifacts_dir, f"{repo_name.replace('/', '_')}_histogram.png")
+    plt.savefig(filename)
+    print(f"Histogram saved as {filename}")
+    return filename  
 
-      - name: Upload Histogram
-        uses: actions/upload-artifact@v4
-        with:
-          name: histogram_issues
-          path: artifacts/histogram.png
+def main():
+    for repo_name in repositories:
+        try:
+            repo = g.get_repo(repo_name)
+            print(f"Processing repository: {repo_name}")
+            labels_count = count_labels(repo)
+            filename = generate_plot(repo_name, labels_count)
+            if filename:
+                print(f"Histogram file created: {filename}")
+        except Exception as e:
+            print(f"Error processing {repo_name}: {e}")
+
+if __name__ == '__main__':
+    main()
+
 
