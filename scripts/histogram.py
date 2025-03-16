@@ -34,11 +34,8 @@ def generate_histogram(repo_name, labels_count):
     plt.xticks(rotation=30, ha='right')
     plt.tight_layout()
 
-    # Ensure the artifacts directory exists
-    artifacts_dir = "artifacts"
-    os.makedirs(artifacts_dir, exist_ok=True)
-
     # Define the path to save the histogram image
+    artifacts_dir = "artifacts"  # Ensure this matches the directory name
     filename = os.path.join(artifacts_dir, "histogram.png")
     print(f"Saving histogram to {filename}")  # Debugging output
     
