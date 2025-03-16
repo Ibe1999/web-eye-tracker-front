@@ -6,7 +6,7 @@ from github import Github
 token = os.getenv('GITHUB_TOKEN')
 
 # List of repositories to analyze
-repositories = ["username/repository"]  # Update this to your repository names
+repositories = ["yourusername/yourrepository"]  # Replace with actual repositories
 
 # Authenticate with GitHub API
 g = Github(token)
@@ -23,7 +23,7 @@ def generate_plot(repo_name, labels_count):
     """Generate and save a histogram of issue labels."""
     if not labels_count:
         print(f"No labeled issues found in {repo_name}.")
-        return None  
+        return None
 
     plt.figure(figsize=(10, 6))
     plt.bar(labels_count.keys(), labels_count.values(), color='b')
@@ -33,15 +33,15 @@ def generate_plot(repo_name, labels_count):
     plt.xticks(rotation=30, ha='right')
     plt.tight_layout()
 
-    # Ensure the artifacts directory exists and save the file there
-    artifacts_dir = "artifacts"
+    # Ensure the artifacts directory exists
+    artifacts_dir = "artifacts"  # Save directly under artifacts/
     os.makedirs(artifacts_dir, exist_ok=True)
 
-    # Set the file path for the histogram
+    # Save the histogram as histogram.png
     filename = os.path.join(artifacts_dir, "histogram.png")
     plt.savefig(filename)
     print(f"Histogram saved as {filename}")
-    return filename  
+    return filename
 
 def main():
     for repo_name in repositories:
@@ -57,6 +57,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
