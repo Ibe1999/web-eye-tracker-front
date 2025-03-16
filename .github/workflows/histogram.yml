@@ -28,14 +28,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: List files in artifacts directory (debug)
+        run: ls -R artifacts/
+
       - name: Move Histograms to artifacts directory
-        run: mv artifacts/histogram.png artifacts/ || echo "No files to move"
+        run: |
+          # Move the generated histogram to the artifacts folder
+          mv artifacts/histograms/*.png artifacts/ || echo "No files to move"
 
       - name: Upload Histogram
         uses: actions/upload-artifact@v4
         with:
           name: histogram_issues
-          path: artifacts/histogram.png
+          path: artifacts/*.png  # Upload all PNG files in the artifacts directory
+
 
 
 
