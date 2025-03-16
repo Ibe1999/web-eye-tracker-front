@@ -1,66 +1,35 @@
-name: Generate Histogram and Save Artifact
+name: Generate Histogram of Issues by Label
 
 on:
-  schedule:
-    - cron: '0 0 * * SUN'  # Every Sunday at midnight
-  workflow_dispatch:  # Allows manual trigger
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  build:
+  generate_histogram:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install matplotlib  # Only matplotlib for histogram generation
+          pip install PyGithub matplotlib
 
-      - name: Ensure artifacts directory exists
-        run: mkdir -p artifacts  # Ensure the artifacts directory exists
+      - name: Run script to generate histogram
+        run: python scripts/histogram.py
 
-      - name: Generate Histogram (Save to artifacts/histogram.png)
-        run: |
-          # Python code to generate histogram
-          python -c "
-import matplotlib.pyplot as plt
-import os
+      - name: Upload histogram as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: histogram
+          path: artifacts/histogram.png
 
-# Data for the histogram (for demonstration purposes, you can modify this)
-data = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5]
-
-# Ensure artifacts directory exists
-os.makedirs('artifacts', exist_ok=True)
-
-# Create histogram
-plt.hist(data, bins=5, edgecolor='black')
-plt.title('Sample Histogram')
-plt.xlabel('Value')
-plt.ylabel('Frequency')
-
-# Save the histogram to the artifacts folder as histogram.png
-plt.savefig('artifacts/histogram.png')
-plt.close()
-          "  # End of the Python code block
-          echo "Histogram saved as artifacts/histogram.png"
-
-      - name: List files in artifacts directory
-        run: ls -lah artifacts/  # List files in artifacts folder to confirm creation
-
-      - name: Configure git
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-
-      - name: Add and commit histogram image
-        run: |
-          git add artifacts/histogram.png  # Add the generated histogram image
-          git commit -m "Add generated histogram image" || echo "No changes to commit"
-          git push  # Push the changes to the repository
