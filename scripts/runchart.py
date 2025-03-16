@@ -65,57 +65,66 @@ fecha_actual = datetime.now()
 fecha_str = fecha_actual.strftime('%Y-%m-%d')
 
 # 1. Gráfico Semanal
-start_week = fecha_actual.date() - timedelta(days=fecha_actual.weekday())
-dias_semana = [start_week + timedelta(days=i) for i in range(7)]
-open_weekly = [open_issues_daily.get(dia, 0) for dia in dias_semana]
-closed_weekly = [closed_issues_daily.get(dia, 0) for dia in dias_semana]
-etiquetas_dias = [dia.strftime('%a %d/%m') for dia in dias_semana]
-plt.figure()
-plt.plot(etiquetas_dias, open_weekly, label='Issues Abiertas', marker='o', linestyle='-')
-plt.plot(etiquetas_dias, closed_weekly, label='Issues Cerradas', marker='s', linestyle='-')
-plt.xlabel('Día de la Semana')
-plt.ylabel('Cantidad de Issues')
-plt.title('Progresión Semanal de Issues')
-plt.legend()
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig(os.path.join(output_dir, 'runchart.png'), dpi=300)  # Guardar como runchart.png
-plt.close()
+try:
+    start_week = fecha_actual.date() - timedelta(days=fecha_actual.weekday())
+    dias_semana = [start_week + timedelta(days=i) for i in range(7)]
+    open_weekly = [open_issues_daily.get(dia, 0) for dia in dias_semana]
+    closed_weekly = [closed_issues_daily.get(dia, 0) for dia in dias_semana]
+    etiquetas_dias = [dia.strftime('%a %d/%m') for dia in dias_semana]
+    plt.figure()
+    plt.plot(etiquetas_dias, open_weekly, label='Issues Abiertas', marker='o', linestyle='-')
+    plt.plot(etiquetas_dias, closed_weekly, label='Issues Cerradas', marker='s', linestyle='-')
+    plt.xlabel('Día de la Semana')
+    plt.ylabel('Cantidad de Issues')
+    plt.title('Progresión Semanal de Issues')
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'runchart.png'), dpi=300)  # Guardar como runchart.png
+    plt.close()
+except Exception as e:
+    print(f"Error al generar el gráfico semanal: {e}")
 
 # 2. Gráfico Mensual por Semanas
-año_mes_actual = f"{fecha_actual.year}-{fecha_actual.month}"  # Se actualiza para que el formato sea consistente
-plt.figure()
-semanas_mes = [f"{año_mes_actual}-S{s}" for s in range(1, 6)]
-open_semanal = [open_issues_weekly.get(semana, 0) for semana in semanas_mes]
-closed_semanal = [closed_issues_weekly.get(semana, 0) for semana in semanas_mes]
-etiquetas_semanas = [f"Semana {s}" for s in range(1, 6)]
-plt.plot(etiquetas_semanas, open_semanal, label='Issues Abiertas', marker='o', linestyle='-')
-plt.plot(etiquetas_semanas, closed_semanal, label='Issues Cerradas', marker='s', linestyle='-')
-plt.xlabel('Semana')
-plt.ylabel('Cantidad de Issues')
-plt.title(f'Issues en {fecha_actual.strftime("%B %Y")} por Semana')
-plt.legend()
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig(os.path.join(output_dir, f'grafico_mensual_{año_mes_actual}.png'), dpi=300)
-plt.close()
+try:
+    año_mes_actual = f"{fecha_actual.year}-{fecha_actual.month}"  # Se actualiza para que el formato sea consistente
+    plt.figure()
+    semanas_mes = [f"{año_mes_actual}-S{s}" for s in range(1, 6)]
+    open_semanal = [open_issues_weekly.get(semana, 0) for semana in semanas_mes]
+    closed_semanal = [closed_issues_weekly.get(semana, 0) for semana in semanas_mes]
+    etiquetas_semanas = [f"Semana {s}" for s in range(1, 6)]
+    plt.plot(etiquetas_semanas, open_semanal, label='Issues Abiertas', marker='o', linestyle='-')
+    plt.plot(etiquetas_semanas, closed_semanal, label='Issues Cerradas', marker='s', linestyle='-')
+    plt.xlabel('Semana')
+    plt.ylabel('Cantidad de Issues')
+    plt.title(f'Issues en {fecha_actual.strftime("%B %Y")} por Semana')
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f'grafico_mensual_{año_mes_actual}.png'), dpi=300)
+    plt.close()
+except Exception as e:
+    print(f"Error al generar el gráfico mensual: {e}")
 
 # 3. Gráfico Global Mensual
-plt.figure()
-meses = sorted(open_issues_monthly.keys())
-open_monthly = [open_issues_monthly.get(mes, 0) for mes in meses]
-closed_monthly = [closed_issues_monthly.get(mes, 0) for mes in meses]
-nombres_meses = [datetime.strptime(mes, '%Y-%m').strftime('%b %Y') for mes in meses]
-plt.plot(nombres_meses, open_monthly, label='Issues Abiertas', marker='o', linestyle='-')
-plt.plot(nombres_meses, closed_monthly, label='Issues Cerradas', marker='s', linestyle='-')
-plt.xlabel('Mes')
-plt.ylabel('Cantidad de Issues')
-plt.title('Estadísticas Globales de Issues')
-plt.legend()
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig(os.path.join(output_dir, f'grafico_global_{fecha_str}.png'), dpi=300)
-plt.close()
+try:
+    plt.figure()
+    meses = sorted(open_issues_monthly.keys())
+    open_monthly = [open_issues_monthly.get(mes, 0) for mes in meses]
+    closed_monthly = [closed_issues_monthly.get(mes, 0) for mes in meses]
+    nombres_meses = [datetime.strptime(mes, '%Y-%m').strftime('%b %Y') for mes in meses]
+    plt.plot(nombres_meses, open_monthly, label='Issues Abiertas', marker='o', linestyle='-')
+    plt.plot(nombres_meses, closed_monthly, label='Issues Cerradas', marker='s', linestyle='-')
+    plt.xlabel('Mes')
+    plt.ylabel('Cantidad de Issues')
+    plt.title('Estadísticas Globales de Issues')
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f'grafico_global_{fecha_str}.png'), dpi=300)
+    plt.close()
+except Exception as e:
+    print(f"Error al generar el gráfico global: {e}")
 
 # Verificación de archivos generados
 print(f"Archivos generados en {output_dir}: {os.listdir(output_dir)}")
