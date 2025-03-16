@@ -67,6 +67,13 @@ jobs:
           echo "$all_issues" > issues.json
           echo "ISSUES_FILE=issues.json" >> $GITHUB_ENV
 
+      - name: Debug API response
+        run: |
+          echo "API response for page $page:"
+          echo "$issues"
+          echo "Contents of issues.json:"
+          cat issues.json
+
       - name: Debug issues.json
         run: |
           echo "Number of issues fetched: $(jq 'length' issues.json)"
