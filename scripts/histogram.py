@@ -33,7 +33,8 @@ def generate_plot(repo_name, labels_count):
     plt.xticks(rotation=30, ha='right')
     plt.tight_layout()
 
-    filename = f"histograms/{repo_name.replace('/', '_')}_histogram.png"
+    # Adjust the file path to match your artifacts directory structure
+    filename = f"artifacts/histograms/{repo_name.replace('/', '_')}_histogram.png"
     os.makedirs(os.path.dirname(filename), exist_ok=True)  # Create the directory if it doesn't exist
     plt.savefig(filename)
     print(f"Histogram saved as {filename}")
@@ -53,3 +54,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
