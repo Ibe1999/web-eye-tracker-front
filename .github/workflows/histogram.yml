@@ -10,50 +10,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository to make sure the workflow can access your code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Python to run the script
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.x"
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install PyGithub matplotlib
 
-      # Step 4: Run the Python script to generate the histogram and save it to the artifacts directory
       - name: Generate histogram (all issues)
         run: python scripts/histogram.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 5: Debug - List the files in the artifacts directory to check if the histogram is generated
+      - name: Ensure artifacts directory exists
+        run: mkdir -p artifacts
+
       - name: List files in artifacts directory (debug)
         run: ls -R artifacts/
 
-      # Step 6: Configure git for pushing changes
+      - name: Check if histogram.png exists
+        run: |
+          if [ -f "artifacts/histogram.png" ]; then
+            echo "histogram.png exists, proceeding with git add";
+          else
+            echo "histogram.png not found, skipping git add and commit";
+            exit 1;  # If not found, terminate the workflow
+          fi
+
       - name: Configure git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
-      # Step 7: Add, commit, and push the generated histogram.png if it exists
-      - name: Check if histogram.png exists and commit
+      - name: Add files to git
         run: |
-          if [ -f "artifacts/histogram.png" ]; then
-            git add artifacts/histogram.png  # Add the generated histogram
-            git commit -m "Add histogram of issues"
-            git push
-          else
-            echo "No histogram found, skipping git commit."  # If no histogram, skip commit
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git add artifacts/*.png  # Add histogram file
+          git status  # Check if the file is staged for commit
+          git commit -m "Add histogram of issues" || echo "No changes to commit"
+          git push
+
 
 
 
