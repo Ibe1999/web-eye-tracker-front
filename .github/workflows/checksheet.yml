@@ -36,15 +36,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
+          # Ensure the artifacts directory exists
+          mkdir -p artifacts
           python scripts/checksheet.py
       
       - name: Verify generated files
         run: |
-          ls -la checksheet_*.png && echo "Image generated correctly" || echo "Image not found"
+          ls -la artifacts/checksheet_*.png && echo "Image generated correctly" || echo "Image not found"
       
       - name: Upload Checksheet as artifacts
         uses: actions/upload-artifact@v4
         with:
           name: checksheet-files
-          path: |
-            checksheet_*.png
+          path: artifacts/checksheet_*.png
