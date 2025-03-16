@@ -28,33 +28,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Debug step to verify the artifacts directory contents
       - name: List files in artifacts directory (debug)
         run: ls -R artifacts/
 
-      - name: Check if histogram.png exists
-        run: |
-          if [ -f "artifacts/histogram.png" ]; then
-            echo "histogram.png exists, proceeding with git add";
-          else
-            echo "histogram.png not found, skipping git add and commit";
-            exit 1;
-          fi
-
+      # Configure git for commit
       - name: Configure git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
+      # Add PNG to git and push
       - name: Add histogram PNG to git
         run: |
-          git add artifacts/histogram.png
+          git add artifacts/*.png  # Add any PNG file in the artifacts/ directory
           git commit -m "Add histogram of issues"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
-
-
-
