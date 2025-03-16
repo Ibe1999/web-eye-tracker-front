@@ -37,5 +37,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: histogram_issues
-          path: artifacts/*.png
+          path: artifacts/histogram.png
 
