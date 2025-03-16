@@ -33,8 +33,8 @@ def generate_plot(repo_name, labels_count):
     plt.xticks(rotation=30, ha='right')
     plt.tight_layout()
 
-    # Ensure the artifacts directory exists
-    artifacts_dir = "artifacts"
+    # Ensure the artifacts directory exists inside the repository folder
+    artifacts_dir = "artifacts"  # Path relative to the repository
     os.makedirs(artifacts_dir, exist_ok=True)
 
     # Save as 'histogram.png' in the artifacts directory
@@ -57,5 +57,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
