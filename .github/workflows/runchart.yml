@@ -36,9 +36,27 @@ jobs:
 
       - name: 🧑‍💻 Obtener los datos de los issues desde GitHub
         run: |
-          issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/${{ github.repository }}/issues?state=all&per_page=100")
-          echo "$issues" > issues.json
+          # Fetch all issues (handle pagination)
+          page=1
+          all_issues="[]"
+          while true; do
+            echo "Fetching page $page..."
+            issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/${{ github.repository }}/issues?state=all&per_page=100&page=$page")
+            if [[ "$issues" == "[]" ]]; then
+              break
+            fi
+            all_issues=$(echo "$all_issues" | jq --argjson new_issues "$issues" '. + $new_issues')
+            page=$((page + 1))
+          done
+
+          # Save issues to issues.json
+          echo "$all_issues" > issues.json
           echo "ISSUES_FILE=issues.json" >> $GITHUB_ENV
+
+      - name: Debug issues.json
+        run: |
+          echo "Contents of issues.json:"
+          cat issues.json
 
       - name: 📊 Ejecutar el script de generación de gráficos
         run: python scripts/runchart.py
