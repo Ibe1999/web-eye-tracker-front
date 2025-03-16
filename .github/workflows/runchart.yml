@@ -16,10 +16,8 @@ jobs:
     steps:
       - name: 📥 Clonar el repositorio
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Clona todo el historial de commits
 
-      - name: 🌍 Instalar localización en español
+      - name: Install Spanish locale
         run: |
           sudo apt-get update
           sudo apt-get install -y locales
@@ -42,36 +40,18 @@ jobs:
           echo "$issues" > issues.json
           echo "ISSUES_FILE=issues.json" >> $GITHUB_ENV
 
-      - name: Create artifacts directory
-        run: mkdir -p artifacts
-
       - name: 📊 Ejecutar el script de generación de gráficos
-        run: python scripts/runchart.py  # Ajusta la ruta si es necesario
+        run: python scripts/runchart.py
 
       - name: List artifacts directory
         run: ls -R artifacts
 
-      # Subir los gráficos como artifacts
-      - name: Subir gráficos como artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: gráficos
-          path: artifacts/runchart.png
-
-      # Commit y push de los artifacts al repositorio
       - name: 💾 Commit y push de los artifacts
         run: |
-          # Configurar Git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Agregar los archivos generados
           git add artifacts/runchart.png
-
-          # Hacer commit de los cambios
           git commit -m "Actualización automática de gráficos [skip ci]"
-
-          # Hacer push de los cambios al repositorio
           git push origin HEAD:${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
