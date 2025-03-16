@@ -29,7 +29,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: List files in artifacts directory (debug)
-        run: ls -R artifacts/
+        run: |
+          echo "Checking contents of the artifacts directory"
+          ls -R artifacts/
+
+      - name: Check if histogram.png exists (debug)
+        run: |
+          if [ -f artifacts/histogram.png ]; then echo "histogram.png exists"; else echo "histogram.png not found"; fi
 
       - name: Configure git
         run: |
@@ -38,11 +44,18 @@ jobs:
 
       - name: Add histogram PNG to git
         run: |
-          git add artifacts/histogram.png  # Ensure we're adding the correct file
-          git commit -m "Add histogram of issues"
-          git push
+          # Check if the histogram.png file exists before adding it to git
+          if [ -f artifacts/histogram.png ]; then
+            git add artifacts/histogram.png
+            git commit -m "Add histogram of issues"
+            git push
+          else
+            echo "histogram.png not found, skipping git add and commit"
+            exit 1
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
 
