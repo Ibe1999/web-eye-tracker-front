@@ -1,35 +1,40 @@
-name: Generate Histogram of Issues by Label
+name: General Report - Histogram of Issues (all)
 
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: '0 0 * * SUN'
   workflow_dispatch:
 
 jobs:
-  generate_histogram:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install PyGithub matplotlib
 
-      - name: Run script to generate histogram
+      - name: Generate histogram (all issues)
         run: python scripts/histogram.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload histogram as artifact
-        uses: actions/upload-artifact@v2
+      - name: Move Histograms to artifacts directory
+        run: mv artifacts/histograms/*.png artifacts/ || echo "No files to move"
+
+      - name: Upload Histogram
+        uses: actions/upload-artifact@v4
         with:
-          name: histogram
-          path: artifacts/histogram.png
+          name: histogram_issues
+          path: artifacts/
+
 
