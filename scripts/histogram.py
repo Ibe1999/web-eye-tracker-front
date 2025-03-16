@@ -34,7 +34,7 @@ def generate_histogram(repo_name, labels_count):
     plt.xticks(rotation=30, ha='right')
     plt.tight_layout()
 
-    # Ensure the artifacts directory exists (this creates it if it doesn't exist)
+    # Ensure the artifacts directory exists
     artifacts_dir = "artifacts"
     os.makedirs(artifacts_dir, exist_ok=True)
 
@@ -44,6 +44,7 @@ def generate_histogram(repo_name, labels_count):
     
     # Save the histogram as a PNG file inside the artifacts folder
     plt.savefig(filename)
+    plt.close()  # Close the plot to free up memory
     print(f"Histogram saved as {filename}")
     
     # Return the filename so the GitHub Actions can commit it later
