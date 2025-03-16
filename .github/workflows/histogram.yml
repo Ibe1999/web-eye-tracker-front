@@ -26,15 +26,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install PyGithub matplotlib
 
-      # Step 4: Create the artifacts directory
-      - name: Create artifacts directory
-        run: mkdir -p artifacts
-
-      # Step 5: Generate histogram (all issues)
+      # Step 4: Generate histogram (all issues)
       - name: Generate histogram (all issues)
         run: python scripts/histogram.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 5: Debug - List contents of artifacts directory
+      - name: Debug artifacts directory
+        run: |
+          ls -l artifacts
 
       # Step 6: Upload Histogram as an artifact
       - name: Upload Histogram
