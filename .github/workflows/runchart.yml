@@ -6,8 +6,8 @@ on:
   workflow_dispatch:  # Permite ejecución manual
 
 permissions:
-  contents: write  # Permiso para escribir en el repositorio
-  issues: read     # Permiso para leer issues
+  contents: write
+  issues: read
 
 jobs:
   generate-report:
@@ -42,10 +42,16 @@ jobs:
           echo "$issues" > issues.json
           echo "ISSUES_FILE=issues.json" >> $GITHUB_ENV
 
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+
       - name: 📊 Ejecutar el script de generación de gráficos
         run: python scripts/runchart.py  # Ajusta la ruta si es necesario
 
-      # Subir los gráficos como artifacts (opcional, para descargar manualmente)
+      - name: List artifacts directory
+        run: ls -R artifacts
+
+      # Subir los gráficos como artifacts
       - name: Subir gráficos como artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -68,4 +74,4 @@ jobs:
           # Hacer push de los cambios al repositorio
           git push origin HEAD:${{ github.ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Token para autenticación
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
