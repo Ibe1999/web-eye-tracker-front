@@ -37,7 +37,7 @@ def generate_plot(repo_name, labels_count):
     artifacts_dir = "artifacts"
     os.makedirs(artifacts_dir, exist_ok=True)
 
-    # Always save as 'histogram.png'
+    # Save as 'histogram.png' in the artifacts directory
     filename = os.path.join(artifacts_dir, "histogram.png")
     plt.savefig(filename)
     print(f"Histogram saved as {filename}")
@@ -57,4 +57,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
