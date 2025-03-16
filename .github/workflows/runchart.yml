@@ -43,13 +43,11 @@ jobs:
       - name: 📊 Ejecutar el script de generación de gráficos
         run: python scripts/scriptrunchart.py  # Ajusta la ruta si es necesario
 
-       # Subir los gráficos como artifacts
+      # Subir los gráficos como artifacts
       - name: Subir gráficos como artifacts
         uses: actions/upload-artifact@v4
         with:
           name: gráficos  # Nombre del artifact que puedes usar para identificarlo
-          path: output/*.png
+          path: artifacts/*.png  # Path ajustado para los artifacts en la carpeta artifacts
 
-
-          
         continue-on-error: true
