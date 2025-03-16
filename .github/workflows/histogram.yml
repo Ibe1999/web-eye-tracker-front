@@ -28,23 +28,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Debug step to verify the artifacts directory contents
       - name: List files in artifacts directory (debug)
         run: ls -R artifacts/
 
-      # Configure git for commit
       - name: Configure git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
-      # Add any new/modified files to git
       - name: Add files to git
         run: |
-          git add .  # Add everything (including files in artifacts/)
+          git add artifacts/*.png  # Add histogram file
           git status  # Check if the file is staged for commit
           git commit -m "Add histogram of issues" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
