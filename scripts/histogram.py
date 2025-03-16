@@ -6,7 +6,7 @@ from github import Github
 token = os.getenv('GITHUB_TOKEN')
 
 # List of repositories to analyze
-repositories = ["username/repository"]  # Replace with your actual repo names
+repositories = ["username/repository"]
 
 # Authenticate with GitHub API
 g = Github(token)
@@ -33,11 +33,12 @@ def generate_plot(repo_name, labels_count):
     plt.xticks(rotation=30, ha='right')
     plt.tight_layout()
 
-    # Ensure the artifacts directory exists in the current working directory
-    artifacts_dir = "artifacts"  # Make sure it's the correct directory
+    # Ensure the artifacts directory exists
+    artifacts_dir = "artifacts"
     os.makedirs(artifacts_dir, exist_ok=True)
 
-    filename = os.path.join(artifacts_dir, "histogram.png")  # Save as 'histogram.png' inside the 'artifacts' directory
+    filename = os.path.join(artifacts_dir, "histogram.png")
+    print(f"Saving histogram to {filename}")  # Debugging output
     plt.savefig(filename)
     print(f"Histogram saved as {filename}")
     return filename  
@@ -56,6 +57,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
