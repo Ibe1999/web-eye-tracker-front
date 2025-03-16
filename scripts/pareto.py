@@ -57,6 +57,8 @@ plt.title('Pareto Chart of Commit Types')
 plt.xticks(rotation=45)
 plt.grid(True)
 
-# Save the plot to a file
-plt.savefig('pareto_chart.png', bbox_inches='tight')
+# Save the plot to the desired location within artifacts directory
+output_dir = 'artifacts/pareto_chart.png'
+os.makedirs(os.path.dirname(output_dir), exist_ok=True)  # Ensure directory exists
+plt.savefig(output_dir, bbox_inches='tight')
 plt.show()
