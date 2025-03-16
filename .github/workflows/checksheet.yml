@@ -6,10 +6,10 @@ permissions:
 
 on:
   schedule:
-    - cron: '0 0 * * 1'  # Runs every Monday
-  workflow_dispatch:  # Allows manual execution
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
   issues:
-    types: [closed]  # Executes when issues are closed
+    types: [closed]
   push:
     branches:
       - master
@@ -36,7 +36,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          # Ensure the artifacts directory exists
           mkdir -p artifacts
           python scripts/checksheet.py
       
@@ -49,3 +48,11 @@ jobs:
         with:
           name: checksheet-files
           path: artifacts/checksheet_*.png
+      
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add artifacts/checksheet_*.png
+          git commit -m "Automatically generated check sheet [skip ci]"
+          git push origin master
