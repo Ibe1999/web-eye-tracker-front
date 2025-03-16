@@ -28,22 +28,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: List files in artifacts/histograms (debug)
-        run: ls -R artifacts/histograms/
-
-      - name: Move Histograms to artifacts directory
-        run: |
-          mv artifacts/histograms/*.png artifacts/ || echo "No files to move"
-
       - name: List files in artifacts directory (debug)
         run: ls -R artifacts/
 
-      - name: Commit and push histogram to repository
+      - name: Configure git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add artifacts/histogram.png
+
+      - name: Add histogram PNG to git
+        run: |
+          git add artifacts/histogram.png  # Ensure we're adding the correct file
           git commit -m "Add histogram of issues"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
