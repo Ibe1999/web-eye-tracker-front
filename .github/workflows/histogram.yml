@@ -2,39 +2,45 @@ name: General Report - Histogram of Issues (all)
 
 on:
   schedule:
-    - cron: '0 0 * * SUN'
-  workflow_dispatch:
+    - cron: '0 0 * * SUN'  # Runs every Sunday at midnight
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
+          python-version: "3.x"  # Use the latest Python 3.x version
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install PyGithub matplotlib
 
+      # Step 4: Create the artifacts directory
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+
+      # Step 5: Generate histogram (all issues)
       - name: Generate histogram (all issues)
         run: python scripts/histogram.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Move Histograms to artifacts directory
-        run: mv artifacts/histograms/*.png artifacts/ || echo "No files to move"
-
+      # Step 6: Upload Histogram as an artifact
       - name: Upload Histogram
         uses: actions/upload-artifact@v4
         with:
           name: histogram_issues
-          path: artifacts/
+          path: artifacts/histogram.png  # Path to the generated histogram
 
 
