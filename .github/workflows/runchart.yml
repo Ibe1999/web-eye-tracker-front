@@ -83,7 +83,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add artifacts/*.png  # Add all PNG files in the artifacts directory
+          git add artifacts/*.png
           git commit -m "Actualización automática de gráficos [skip ci]"
           git push origin HEAD:${{ github.ref }}
         env:
