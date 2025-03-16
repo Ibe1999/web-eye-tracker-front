@@ -19,7 +19,7 @@ def count_labels(repo):
             labels_count[label.name] = labels_count.get(label.name, 0) + 1
     return labels_count
 
-def generate_plot(repo_name, labels_count):
+def generate_histogram(repo_name, labels_count):
     """Generate and save a histogram of issue labels."""
     if not labels_count:
         print(f"No labeled issues found in {repo_name}.")
@@ -55,7 +55,7 @@ def main():
             repo = g.get_repo(repo_name)
             print(f"Processing repository: {repo_name}")
             labels_count = count_labels(repo)
-            filename = generate_plot(repo_name, labels_count)
+            filename = generate_histogram(repo_name, labels_count)
             if filename:
                 print(f"Histogram file created: {filename}")
         except Exception as e:
@@ -63,6 +63,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
