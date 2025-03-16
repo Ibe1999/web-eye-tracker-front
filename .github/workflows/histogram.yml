@@ -38,11 +38,13 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
 
-      # Add PNG to git and push
-      - name: Add histogram PNG to git
+      # Add any new/modified files to git
+      - name: Add files to git
         run: |
-          git add artifacts/*.png  # Add any PNG file in the artifacts/ directory
-          git commit -m "Add histogram of issues"
+          git add .  # Add everything (including files in artifacts/)
+          git status  # Check if the file is staged for commit
+          git commit -m "Add histogram of issues" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
