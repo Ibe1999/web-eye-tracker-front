@@ -23,15 +23,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install PyGithub matplotlib
+          pip install matplotlib
 
-      - name: Ensure artifacts directory exists
-        run: mkdir -p artifacts
-
-      - name: Generate histogram (all issues)
+      - name: Generate histogram
         run: python scripts/histogram.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
       - name: Debug - Check if histogram file exists
         run: ls -l artifacts/histogram.png
