@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GIT_PAT }}  # Use GIT_PAT secret
+          token: ${{ secrets.GH_PAT }}  # Use the GH_PAT secret
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -28,7 +28,7 @@ jobs:
       - name: Generate histogram
         run: python scripts/histogram.py
         env:
-          GIT_PAT: ${{ secrets.GIT_PAT }}  # Pass the GIT_PAT secret as an environment variable
+          GIT_PAT: ${{ secrets.GH_PAT }}  # Pass the GH_PAT secret as an environment variable
 
       - name: Debug - Check if histogram file exists
         run: |
@@ -43,6 +43,3 @@ jobs:
           git commit -m "Update histogram report"
           git pull --rebase origin main  # Ensure the branch is up-to-date
           git push origin main
-
-
-
