@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.GIT_PAT }}  # Use GIT_PAT secret
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -23,13 +23,17 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install matplotlib
+          pip install PyGithub matplotlib
 
       - name: Generate histogram
         run: python scripts/histogram.py
+        env:
+          GIT_PAT: ${{ secrets.GIT_PAT }}  # Pass the GIT_PAT secret as an environment variable
 
       - name: Debug - Check if histogram file exists
-        run: ls -l artifacts/histogram.png
+        run: |
+          ls -l artifacts
+          ls -l artifacts/histogram.png
 
       - name: Commit and push histogram to repository
         run: |
