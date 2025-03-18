@@ -3,7 +3,7 @@ name: General Report - Histogram of Issues (all)
 on:
   schedule:
     - cron: '0 0 * * SUN'  # Runs every Sunday at midnight
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
 
 jobs:
   build:
@@ -36,18 +36,13 @@ jobs:
       - name: Debug - List files in artifacts directory
         run: ls -l artifacts
 
-      - name: Commit and Push Histogram to Repository
+      - name: Commit and push histogram to repository
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          if [ -f "artifacts/histogram.png" ]; then
-            git add artifacts/histogram.png
-            git commit -m "Auto-update histogram"
-            git push https://github.com/Ibe1999/web-eye-tracker-front.git HEAD:main
-          else
-            echo "❌ No histogram file found, skipping commit."
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          git add artifacts/histogram.png
+          git commit -m "Update histogram report"
+          git push origin main
+
 
 
