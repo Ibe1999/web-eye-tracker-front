@@ -46,42 +46,11 @@ def generate_histogram(repo_name, labels_count):
     print(f"Histogram saved as {filename}")
     return filename  
 
-def commit_and_push(filename):
-    """Commit and push the histogram image to the GitHub repository."""
-    try:
-        with open(filename, "rb") as f:
-            content = f.read()
-        
-        # Define file path in the repo
-        repo_file_path = "artifacts/histogram.png"  # Path in the repository
-
-        # Get the current timestamp
-        commit_message = f"Update histogram - {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}"
-
-        # Check if file exists in repo
-        contents = None
-        try:
-            contents = repo.get_contents(repo_file_path)
-        except:
-            pass  # File doesn't exist yet
-
-        if contents:
-            repo.update_file(repo_file_path, commit_message, content, contents.sha)
-            print("Histogram updated in the repository.")
-        else:
-            repo.create_file(repo_file_path, commit_message, content)
-            print("Histogram uploaded to the repository.")
-
-    except Exception as e:
-        print(f"Error committing file: {e}")
-
 def main():
     try:
         print(f"Processing repository: {repo_name}")
         labels_count = count_labels(repo)
-        filename = generate_histogram(repo_name, labels_count)
-        if filename:
-            commit_and_push(filename)
+        generate_histogram(repo_name, labels_count)
     except Exception as e:
         print(f"Error processing {repo_name}: {e}")
 
