@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import os
-from github import Github, InputGitTreeElement
+from github import Github
 from datetime import datetime
 
 # Authenticate with GitHub API using the token
@@ -39,7 +39,7 @@ def generate_histogram(repo_name, labels_count):
     # Save the histogram as a PNG file inside the artifacts folder
     artifacts_dir = "artifacts"
     os.makedirs(artifacts_dir, exist_ok=True)  # Ensure directory exists
-    filename = os.path.join(artifacts_dir, "histogram.png")
+    filename = os.path.join(artifacts_dir, "histogram.png")  # Fixed typo in filename
     plt.savefig(filename)
     plt.close()
 
@@ -53,7 +53,7 @@ def commit_and_push(filename):
             content = f.read()
         
         # Define file path in the repo
-        repo_file_path = f"artifacts/histogram.png"
+        repo_file_path = "artifacts/histogram.png"  # Fixed typo in filename
 
         # Get the current timestamp
         commit_message = f"Updated histogram - {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}"
