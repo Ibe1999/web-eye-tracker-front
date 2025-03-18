@@ -30,10 +30,9 @@ jobs:
         env:
           GIT_PAT: ${{ secrets.GH_PAT }}  # Pass the GH_PAT secret as an environment variable
 
-      - name: Debug - Check if histogram file exists
+      - name: Debug - Check artifacts directory
         run: |
           ls -l artifacts
-          ls -l artifacts/histogram.png
 
       - name: Commit and push histogram to repository
         run: |
