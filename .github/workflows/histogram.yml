@@ -33,6 +33,7 @@ jobs:
       - name: Debug - Check artifacts directory
         run: |
           ls -l artifacts
+          ls -l artifacts/histogram.png
 
       - name: Commit and push histogram to repository
         run: |
