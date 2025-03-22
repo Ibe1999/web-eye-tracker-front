@@ -1,10 +1,12 @@
-import matplotlib.pyplot as plt
 import os
+import matplotlib.pyplot as plt
 from github import Github
-from datetime import datetime
 
 # Authenticate with GitHub API using the token
-token = os.getenv('GIT_PAT')  # Use GIT_PAT instead of GITHUB_TOKEN
+token = os.getenv('GH_PAT')  # Use GH_PAT instead of GITHUB_TOKEN
+
+if not token:
+    raise ValueError("GitHub token not found. Ensure GH_PAT is set as an environment variable.")
 
 # Define repository name
 repo_name = "Ibe1999/web-eye-tracker-front"
