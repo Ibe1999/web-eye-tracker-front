@@ -28,18 +28,19 @@ jobs:
       - name: Generate histogram
         run: python scripts/histogram.py
         env:
-          GIT_PAT: ${{ secrets.GH_PAT }}  # Pass the GH_PAT secret as an environment variable
+          GH_PAT: ${{ secrets.GH_PAT }}  # Pass the GH_PAT secret as an environment variable
 
       - name: Debug - Check artifacts directory
         run: |
-          ls -l artifacts
-          ls -l artifacts/histogram.png
+          echo "Checking artifacts directory contents..."
+          ls -l artifacts || echo "No artifacts directory found."
+          ls -l artifacts/histogram.png || echo "No histogram found."
 
       - name: Commit and push histogram to repository
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add artifacts/histogram.png
-          git commit -m "Update histogram report"
+          git add artifacts/histogram.png || echo "No histogram to commit."
+          git commit -m "Update histogram report" || echo "No changes to commit."
           git pull --rebase origin main  # Ensure the branch is up-to-date
-          git push origin main
+          git push origin main || echo "No changes to push."
