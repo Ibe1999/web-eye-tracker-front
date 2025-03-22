@@ -26,7 +26,7 @@ def count_labels(repo):
 def generate_histogram(repo_name, labels_count):
     """Generate and save a histogram of issue labels."""
     if not labels_count:
-        print(f"No labeled issues found in {repo_name}.")
+        print(f"No labeled issues found in {repo_name}. Skipping histogram generation.")
         return None  
 
     # Create a bar plot for the issue labels
@@ -41,7 +41,7 @@ def generate_histogram(repo_name, labels_count):
     # Save the histogram as a PNG file inside the artifacts folder
     artifacts_dir = "artifacts"
     os.makedirs(artifacts_dir, exist_ok=True)  # Ensure directory exists
-    filename = os.path.join(artifacts_dir, "histogram.png")  # Save as histogram.png
+    filename = os.path.join(artifacts_dir, "histogram.png")  # Always save as histogram.png
     plt.savefig(filename)
     plt.close()
 
@@ -58,3 +58,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
