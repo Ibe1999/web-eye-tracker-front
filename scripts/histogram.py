@@ -1,41 +1,63 @@
-name: Generate and Upload Histogram
+import os
+import matplotlib.pyplot as plt
+from github import Github
 
-on:
-  schedule:
-    - cron: '0 0 * * 0'  # Runs every Sunday at midnight UTC
-  workflow_dispatch:  # Allows manual trigger
+# Authenticate with GitHub API using the token
+token = os.getenv('GH_PAT')  # Use GH_PAT instead of GITHUB_TOKEN
 
-jobs:
-  generate-histogram:
-    runs-on: ubuntu-latest
+if not token:
+    raise ValueError("GitHub token not found. Ensure GH_PAT is set as an environment variable.")
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GH_PAT }}  # Ensure this token has repo write permissions
+# Define repository name
+repo_name = "Ibe1999/web-eye-tracker-front"
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
+# Authenticate with GitHub API
+g = Github(token)
+repo = g.get_repo(repo_name)
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt  # Add dependencies if needed
+def count_labels(repo):
+    """Count the number of issues for each label in a repository."""
+    labels_count = {}
+    for issue in repo.get_issues(state="all"):
+        for label in issue.labels:
+            labels_count[label.name] = labels_count.get(label.name, 0) + 1
+    return labels_count
 
-      - name: Run histogram script
-        run: python scripts/histogram.py  # Ensure correct path
+def generate_histogram(repo_name, labels_count):
+    """Generate and save a histogram of issue labels."""
+    if not labels_count:
+        print(f"No labeled issues found in {repo_name}. Skipping histogram generation.")
+        return None  
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+    # Create a bar plot for the issue labels
+    plt.figure(figsize=(10, 6))
+    plt.bar(labels_count.keys(), labels_count.values(), color='b')
+    plt.ylabel('Number of Issues')
+    plt.xlabel('Labels')
+    plt.title(f'Histogram of Issues by Label - {repo_name}')
+    plt.xticks(rotation=30, ha='right')
+    plt.tight_layout()
 
-      - name: Commit and Push Updated Histogram
-        run: |
-          git add artifacts/histogram.png
-          git commit -m "Update histogram (automated)"
-          git push origin main
+    # Save the histogram as a PNG file inside the artifacts folder
+    artifacts_dir = "artifacts"
+    os.makedirs(artifacts_dir, exist_ok=True)  # Ensure directory exists
+    filename = os.path.join(artifacts_dir, "histogram.png")  # Always save as histogram.png
+    plt.savefig(filename)
+    plt.close()
+
+    print(f"Histogram saved as {filename}")
+    return filename  
+
+def main():
+    try:
+        print(f"Processing repository: {repo_name}")
+        labels_count = count_labels(repo)
+        generate_histogram(repo_name, labels_count)
+    except Exception as e:
+        print(f"Error processing {repo_name}: {e}")
+
+if __name__ == '__main__':
+    main()
+
 
 
