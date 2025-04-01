@@ -1,19 +1,21 @@
 name: General Report - Histogram of Issues (all)
 
+permissions:
+  contents: write
+  issues: read
+
 on:
   schedule:
-    - cron: '0 0 * * SUN'  # Runs every Sunday at midnight
+    - cron: '0 0 * * 0'  # Runs every Sunday at midnight UTC
   workflow_dispatch:
 
 jobs:
-  build:
+  histogram_analysis:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GH_PAT }}  # Use the GH_PAT secret
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -23,29 +25,46 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install PyGithub matplotlib
+          pip install pandas matplotlib
 
-      - name: Generate histogram
+      - name: Fetch issue data
+        run: |
+          issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/${{ github.repository }}/issues?state=all&per_page=100")
+          echo "$issues" > issues.json
+          echo "ISSUES_FILE=issues.json" >> $GITHUB_ENV
+          
+      - name: Print issues.json content
+        run: cat issues.json
+
+      - name: Run Histogram script
         run: python scripts/histogram.py
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}  # Pass the GH_PAT secret as an environment variable
 
-      - name: Debug - List artifacts directory
-        run: |
-          echo "Checking artifacts directory contents..."
-          ls -R artifacts || echo "No artifacts directory found."
+      - name: Ensure artifacts directory exists
+        run: mkdir -p artifacts
 
-      - name: Commit and push histogram to repository
+      - name: List files to check for generated images
+        run: ls -lah
+
+      - name: Check if Histogram chart is generated
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f "artifacts/histogram.png" ]; then 
+            echo "Histogram chart generated successfully."; 
+          else 
+            echo "Histogram chart not found."; 
+            exit 1;
+          fi
+
+      - name: Commit and push Histogram to repository
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
           
           if [ -f artifacts/histogram.png ]; then
             git add artifacts/histogram.png
-            git commit -m "Update histogram report"
-            git pull --rebase origin main  # Ensure the branch is up-to-date
+            git commit -m "Update histogram report" || echo "No changes to commit"
             git push origin main
           else
             echo "No histogram generated. Skipping commit."
           fi
+
 
