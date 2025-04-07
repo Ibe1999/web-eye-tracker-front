@@ -1,8 +1,8 @@
- name: General Report - Histogram of Issues (all)
+name: General Report - Histogram of Issues (all)
 
 on:
   schedule:
-    - cron: '0 0 * * SUN'  # Runs every Sunday at midnight
+    - cron: '0 0 * * SUN'
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}  # Use the GH_PAT secret
+          token: ${{ secrets.GH_PAT }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -22,32 +22,23 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install PyGithub matplotlib
 
-      - name: Generate histogram
+      - name: Run histogram script
         run: python scripts/histogram.py
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}  # Pass the GH_PAT secret as an environment variable
-
-      - name: Debug - List artifacts directory
-        run: |
-          echo "Checking artifacts directory contents..."
-          ls -R artifacts || echo "No artifacts directory found."
+          GIT_PAT: ${{ secrets.GH_PAT }}
 
       - name: Commit and push histogram to repository
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          if [ -f artifacts/histogram.png ]; then
-            git add artifacts/histogram.png
-            git commit -m "Update histogram report"
-            git pull --rebase origin main  # Ensure the branch is up-to-date
-            git push origin main
-          else
-            echo "No histogram generated. Skipping commit."
-          fi
+          git add artifacts/histogram.png
+          git commit -m "Auto: Update histogram report" || echo "No changes"
+          git pull --rebase origin main
+          git push origin main
+
 
 
 
