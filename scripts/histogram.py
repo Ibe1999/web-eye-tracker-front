@@ -3,7 +3,7 @@ import os
 from github import Github
 
 token = os.getenv('GH_PAT')
-repo_name = "Ibe1999/web-eye-tracker-front"
+repo_name = "ruxailab/web-eye-tracker-front"
 
 g = Github(token)
 repo = g.get_repo(repo_name)
