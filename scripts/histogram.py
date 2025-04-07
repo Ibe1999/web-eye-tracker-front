@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import os
 from github import Github
 
-token = os.getenv('GIT_PAT')
+token = os.getenv('GH_PAT')
 repo_name = "Ibe1999/web-eye-tracker-front"
 
 g = Github(token)
