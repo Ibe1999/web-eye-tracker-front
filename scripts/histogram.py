@@ -1,9 +1,22 @@
-
 import os
 import matplotlib.pyplot as plt
 from github import Github
 
+# Authenticate with GitHub API using the token
+token = os.getenv('GH_PAT')  # Use GH_PAT instead of GITHUB_TOKEN
+
+if not token:
+    raise ValueError("GitHub token not found. Ensure GH_PAT is set as an environment variable.")
+
+# Define repository name
+repo_name = "Ibe1999/web-eye-tracker-front"
+
+# Authenticate with GitHub API
+g = Github(token)
+repo = g.get_repo(repo_name)
+
 def count_labels(repo):
+    """Count the number of issues for each label in a repository."""
     labels_count = {}
     for issue in repo.get_issues(state="all"):
         for label in issue.labels:
@@ -11,52 +24,37 @@ def count_labels(repo):
     return labels_count
 
 def generate_histogram(repo_name, labels_count):
+    """Generate and save a histogram of issue labels."""
     if not labels_count:
-        print("No labeled issues found")
-        return None
+        print(f"No labeled issues found in {repo_name}. Skipping histogram generation.")
+        return None  
 
-    sorted_labels = sorted(labels_count.items(), key=lambda x: x[1], reverse=True)
-    labels, counts = zip(*sorted_labels)
-
-    plt.figure(figsize=(max(10, len(labels) * 0.5), 8))
-    bars = plt.bar(labels, counts, color='#2ca02c')
-
-    for bar in bars:
-        height = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2., height,
-                f'{int(height)}',
-                ha='center', va='bottom')
-
+    # Create a bar plot for the issue labels
+    plt.figure(figsize=(10, 6))
+    plt.bar(labels_count.keys(), labels_count.values(), color='b')
     plt.ylabel('Number of Issues')
     plt.xlabel('Labels')
-    plt.title(f'Issue Label Distribution - {repo_name}')
-    plt.xticks(rotation=45, ha='right')
+    plt.title(f'Histogram of Issues by Label - {repo_name}')
+    plt.xticks(rotation=30, ha='right')
     plt.tight_layout()
 
-    filename = "artifacts/histogram.png"
-    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    # Save the histogram as a PNG file inside the artifacts folder
+    artifacts_dir = "artifacts"
+    os.makedirs(artifacts_dir, exist_ok=True)  # Ensure directory exists
+    filename = os.path.join(artifacts_dir, "histogram.png")  # Always save as histogram.png
+    plt.savefig(filename)
     plt.close()
-    
-    return filename
+
+    print(f"Histogram saved as {filename}")
+    return filename  
 
 def main():
-    token = os.getenv('GH_PATH')
-    if not token:
-        raise ValueError("GitHub token not found")
-
-    repo_name = "Ibe1999/web-eye-tracker-front"
-    
     try:
-        g = Github(token)
-        repo = g.get_repo(repo_name)
+        print(f"Processing repository: {repo_name}")
         labels_count = count_labels(repo)
-        
-        if labels_count:
-            generate_histogram(repo_name, labels_count)
-            
+        generate_histogram(repo_name, labels_count)
     except Exception as e:
-        print(f"Error: {e}")
-        raise
+        print(f"Error processing {repo_name}: {e}")
 
 if __name__ == '__main__':
     main()
