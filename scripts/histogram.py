@@ -28,7 +28,7 @@ def generate_histogram(repo_name, labels_count):
     plt.xticks(rotation=30, ha='right')
     plt.tight_layout()
 
-    artifacts_dir = os.path.join(os.path.dirname(__file__), '..', 'artifacts')
+    artifacts_dir = os.path.join(os.getcwd(), 'artifacts')
     os.makedirs(artifacts_dir, exist_ok=True)
     filename = os.path.join(artifacts_dir, "histogram.png")
     plt.savefig(filename)
@@ -47,4 +47,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
