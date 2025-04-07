@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for git history operations
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -29,8 +31,10 @@ jobs:
 
       - name: Run Histogram script
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: python scripts/histogram.py
+          GH_PATH: ${{ secrets.GH_PATH }}  # Changed to match your token name
+        run: |
+          mkdir -p artifacts
+          python scripts/histogram.py
 
       - name: Check if Histogram chart is generated
         run: |
@@ -45,14 +49,10 @@ jobs:
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
-
-          if [ -f artifacts/histogram.png ]; then
-            git pull origin main
-            git add artifacts/histogram.png
-            git commit -m "Update histogram report"
-            git push origin main
-          else
-            echo "No histogram generated. Skipping commit."
+          git pull origin main
+          git add artifacts/histogram.png
+          git commit -m "Automated update: Histogram report [skip ci]"
+          git push origin main
 
 
 
