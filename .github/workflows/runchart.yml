@@ -47,7 +47,7 @@ jobs:
           all_issues="[]"
           while [[ $page -le $max_pages ]]; do
             echo "Fetching page $page..."
-            issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/Ibe1999/web-eye-tracker-front/issues?state=all&per_page=100&page=$page")
+            issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/ruxailab/web-eye-tracker-front/issues?state=all&per_page=100&page=$page")
             if [[ $(echo "$issues" | jq 'length') -eq 0 ]]; then
               echo "No more issues found. Exiting pagination loop."
               break
