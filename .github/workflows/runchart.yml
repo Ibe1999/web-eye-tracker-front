@@ -2,8 +2,8 @@ name: Generar Reporte de Issues
 
 on:
   schedule:
-    - cron: "0 0 * * 1"  # Se ejecuta cada lunes a las 00:00 UTC
-  workflow_dispatch:  # Permite ejecución manual
+    - cron: "0 0 * * 1"  # Cada lunes a las 00:00 UTC
+  workflow_dispatch:     # Permite ejecución manual
 
 permissions:
   contents: write
@@ -17,7 +17,7 @@ jobs:
       - name: 📥 Clonar el repositorio
         uses: actions/checkout@v4
         with:
-          ref: main  # Especifica la rama main
+          ref: main
 
       - name: Install Spanish locale
         run: |
@@ -36,56 +36,38 @@ jobs:
       - name: 📦 Instalar dependencias
         run: pip install requests matplotlib scipy jq
 
-      - name: Check rate limit
+      - name: 🔍 Verificar límite de rate
         run: |
           curl -H "Authorization: token ${{ secrets.GH_PAT }}" https://api.github.com/rate_limit
 
       - name: 🧑‍💻 Obtener los datos de los issues desde GitHub
         run: |
-          # Fetch all issues (handle pagination)
           page=1
-          max_pages=10  # Safeguard to prevent infinite loops
+          max_pages=10
           all_issues="[]"
           while [[ $page -le $max_pages ]]; do
             echo "Fetching page $page..."
-            issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/${{ github.repository }}/issues?state=all&per_page=100&page=$page")
-            
-            # Debug API response
-            echo "API response for page $page:"
-            echo "$issues"
-
-            # Check if the response is empty (end of pagination)
+            issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/Ibe1999/web-eye-tracker-front/issues?state=all&per_page=100&page=$page")
             if [[ $(echo "$issues" | jq 'length') -eq 0 ]]; then
               echo "No more issues found. Exiting pagination loop."
               break
             fi
-
-            # Append the new issues to the existing list
             all_issues=$(echo "$all_issues" | jq --argjson new_issues "$issues" '. + $new_issues')
             page=$((page + 1))
           done
-
-          # Save issues to issues.json
           echo "$all_issues" > issues.json
           echo "ISSUES_FILE=issues.json" >> $GITHUB_ENV
 
-      - name: Debug API response
+      - name: 🐛 Debug de issues
         run: |
-          echo "API response for page $page:"
-          echo "$issues"
-          echo "Contents of issues.json:"
-          cat issues.json
-
-      - name: Debug issues.json
-        run: |
-          echo "Number of issues fetched: $(jq 'length' issues.json)"
-          echo "First issue:"
+          echo "Número total de issues: $(jq 'length' issues.json)"
+          echo "Primer issue:"
           jq '.[0]' issues.json
 
-      - name: 📊 Ejecutar el script de generación de gráficos
+      - name: 📊 Ejecutar script de generación de gráficos
         run: python scripts/runchart.py
 
-      - name: List artifacts directory
+      - name: 📁 Listar archivos generados
         run: ls -R artifacts
 
       - name: 💾 Commit y push de los artifacts
@@ -93,7 +75,8 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add artifacts/*.png
-          git commit -m "Actualización automática de gráficos [skip ci]"
-          git push origin main  # Push to the main branch
+          git commit -m "Actualización automática de gráficos [skip ci]" || echo "No hay cambios para hacer commit"
+          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/Ibe1999/web-eye-tracker-front.git HEAD:main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+
