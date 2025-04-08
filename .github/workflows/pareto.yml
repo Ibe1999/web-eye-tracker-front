@@ -35,7 +35,7 @@ jobs:
 
       - name: Fetch issue data
         run: |
-          issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/${{ github.repository }}/issues?state=all&per_page=100")
+          issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/ruxailab/web-eye-tracker-front/issues?state=all&per_page=100")
           echo "$issues" > issues.json
           echo "ISSUES_FILE=issues.json" >> $GITHUB_ENV
           
