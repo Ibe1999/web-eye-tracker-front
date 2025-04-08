@@ -1,9 +1,11 @@
+
+
 name: Generar Reporte de Issues
 
 on:
   schedule:
-    - cron: "0 0 * * 1"  # Cada lunes a las 00:00 UTC
-  workflow_dispatch:     # Permite ejecución manual
+    - cron: "0 0 * * 1"  # Se ejecuta cada lunes a las 00:00 UTC
+  workflow_dispatch:  # Permite ejecución manual
 
 permissions:
   contents: write
@@ -17,7 +19,7 @@ jobs:
       - name: 📥 Clonar el repositorio
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: main  # Especifica la rama main
 
       - name: Install Spanish locale
         run: |
@@ -36,38 +38,48 @@ jobs:
       - name: 📦 Instalar dependencias
         run: pip install requests matplotlib scipy jq
 
-      - name: 🔍 Verificar límite de rate
+      - name: Check rate limit
         run: |
           curl -H "Authorization: token ${{ secrets.GH_PAT }}" https://api.github.com/rate_limit
 
-      - name: 🧑‍💻 Obtener los datos de los issues desde GitHub
+      - name: 🧑‍💻 Obtener los datos de los issues desde GitHub (ruxailab)
         run: |
+          # Crear un directorio temporal para almacenar archivos de issues
+          mkdir -p temp_issues
           page=1
-          max_pages=10
-          all_issues="[]"
+          max_pages=10  # Número máximo de páginas a recuperar para evitar bucles infinitos
+          
+          # Obtener issues página por página
           while [[ $page -le $max_pages ]]; do
             echo "Fetching page $page..."
-            issues=$(curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" "https://api.github.com/repos/ruxailab/web-eye-tracker-front/issues?state=all&per_page=100&page=$page")
-            if [[ $(echo "$issues" | jq 'length') -eq 0 ]]; then
-              echo "No more issues found. Exiting pagination loop."
+            curl -s -H "Authorization: token ${{ secrets.GH_PAT }}" \
+              "https://api.github.com/repos/ruxailab/web-eye-tracker-front/issues?state=all&per_page=100&page=$page" \
+              -o "temp_issues/issues_$page.json"
+            
+            # Verificar si el archivo está vacío (sin issues) y salir
+            if [[ $(jq length "temp_issues/issues_$page.json") -eq 0 ]]; then
+              echo "No more issues found on page $page."
               break
             fi
-            all_issues=$(echo "$all_issues" | jq --argjson new_issues "$issues" '. + $new_issues')
             page=$((page + 1))
           done
-          echo "$all_issues" > issues.json
+
+          # Fusionar todos los archivos de issues en un solo archivo issues.json
+          jq -s 'add' temp_issues/issues_*.json > issues.json
+
+          # Establecer la ruta del archivo issues.json como variable de entorno
           echo "ISSUES_FILE=issues.json" >> $GITHUB_ENV
 
-      - name: 🐛 Debug de issues
+      - name: Debug API response
         run: |
-          echo "Número total de issues: $(jq 'length' issues.json)"
-          echo "Primer issue:"
-          jq '.[0]' issues.json
+          echo "Contents of issues.json:"
+          cat issues.json
+          echo "Number of issues fetched: $(jq 'length' issues.json)"
 
-      - name: 📊 Ejecutar script de generación de gráficos
+      - name: 📊 Ejecutar el script de generación de gráficos
         run: python scripts/runchart.py
 
-      - name: 📁 Listar archivos generados
+      - name: List artifacts directory
         run: ls -R artifacts
 
       - name: 💾 Commit y push de los artifacts
@@ -75,8 +87,11 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add artifacts/*.png
-          git commit -m "Actualización automática de gráficos [skip ci]" || echo "No hay cambios para hacer commit"
-          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/Ibe1999/web-eye-tracker-front.git HEAD:main
+          git commit -m "Actualización automática de gráficos [skip ci]"
+          git push origin main  # Push to the main branch
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Cleanup temp files
+        if: always()
+        run: rm -rf temp_issues
